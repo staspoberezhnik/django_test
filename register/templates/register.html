@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+    <div class="well bs-component">
+    <form method="post" enctype="multipart/form-data" class="form-horizontal">
+        {% csrf_token %}
+        {{ form|bootstrap_horizontal }}
+
+        <div class="form-group">
+          <div class="col-lg-10 col-lg-offset-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+         </form>
+    </div>
+{% endblock %}

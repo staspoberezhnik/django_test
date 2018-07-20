@@ -1,0 +1,6 @@
+.venv
+venv
+avatars
+.idea
+.env
+db.sqlite3

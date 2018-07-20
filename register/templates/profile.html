@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+{#    {% if user.photo %}#}
+{#    <img src='{{ user.photo.url }}' class='img-responsive' width="300px" height="300px">#}
+{#    {% endif %}#}
+
+
+    <h3>Username : {{ user.username }}</h3>
+
+
+    {% if user.first_name %}
+    <h4>First name : {{ user.first_name}}</h4>
+    {% endif %}
+
+    {% if user.last_name %}
+    <h4>Last name : {{ user.last_name}}</h4>
+    {% endif %}
+
+    {% if user.email %}
+    <h4>Email : {{ user.email}}</h4>
+    {% endif %}
+
+    {% if user.phone_number %}
+    <h4>Telephone : {{ user.phone_number}}</h4>
+    {% endif %}
+
+
+    {% if user.date_joined %}
+    <h4>On site since : {{ user.date_joined}}</h4>
+    {% endif %}
+
+    {% if can_edit %}
+
+<p> <button type="button" class="btn btn-default" value="Edit"><a href="">Edit Profile</a> </button></p>
+
+    {% endif %}
+{% endblock content %}

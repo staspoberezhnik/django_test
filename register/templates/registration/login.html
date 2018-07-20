@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+
+{% block content %}
+    <form action='{% url "log_in"%}' method="POST" class="horizontal" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|bootstrap_horizontal }}
+            {% if error %}
+            <p><label class="error"><h2>{{ error }}</h2></label>
+            {% endif %}
+        <p><input class="btn btn-success" type="submit" value="Log In">
+        <a href='{% url "register"%}' class="btn btn-warning">Register</a>
+    </form>
+{% endblock %}
