@@ -1,13 +1,15 @@
 from django.conf.urls import url
 from . import views
-from .views import RegisterView, LogInView, LogOutView, SeeProfileView
+from .views import RegisterView, LogInView, LogOutView, SeeProfileView, AllUsersView, EditProfileView
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
     url(r'^login/$', LogInView.as_view(), name='login'),
     url(r'^logout/$', LogOutView.as_view(), name='logout'),
-    # url(r'^profile/$', SeeProfileView.as_view(), name='profile'),
-    url(r'^profile/(?P<id>\d+)/$', views.load_profile, name='profile'),
+    url(r'^profile/(?P<id>\d+)$', SeeProfileView.as_view(), name='profile'),
+    url(r'^users/$', AllUsersView.as_view(), name='all_users'),
+    url(r'^edit/(?P<id>\d+)$', EditProfileView.as_view(), name='edit_profile'),
+    # url(r'^profile/(?P<id>\d+)/$', views.load_profile, name='profile'),
 
     # url(r'^$', views.log_in, name='login'),
     # url(r'^register/$', views.register, name='register'),

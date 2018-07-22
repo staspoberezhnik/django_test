@@ -1,16 +1,14 @@
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import View
+from django.views.generic import View, TemplateView, ListView
 
 from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth
-from phonenumbers import NumberParseException
-
-from .forms import RegistrationForm
-from django.contrib.auth.models import User
+from .forms import RegistrationForm, ChangeForm
+from .models import User
 import phonenumbers
-from django.views.generic import CreateView, FormView
+from django.views.generic import CreateView, FormView, UpdateView
 
 
 class RegisterView(CreateView):
@@ -39,51 +37,55 @@ class LogOutView(LogoutView):
     redirect_field_name = None
 
 
-class SeeProfileView(View):
-    def load_profile(self):
-        user_instance = get_object_or_404(User, id=id)
+class SeeProfileView(ListView):
+    template_name = 'profile.html'
+
+    def get_queryset(self):
+        return get_object_or_404(User, id=self.kwargs['id'])
+
+    def get_context_data(self, **kwargs):
+        user_instance = get_object_or_404(User, id=self.kwargs['id'])
         username = None
         can_edit = None
+        print(user_instance.id, self.request.user.id)
         if self.request.user.is_staff or \
                 self.request.user.is_superuser or \
                 self.request.user.is_authenticated:
             username = auth.get_user(self.request).username
-
+        print('hello')
         if user_instance.id == self.request.user.id:
             can_edit = True
-
         context = {
             'user': user_instance,
             'can_edit': can_edit,
             'username': username,
         }
-
-        return render(self.request, 'profile.html', context)
-
-
-def load_profile(request, id):
-    user_instance = get_object_or_404(register_user, pk=id)
-
-    print(user_instance)
-    username = None
-    can_edit = None
-    if request.user.is_staff or \
-            request.user.is_superuser or \
-            request.user.is_authenticated:
-        username = auth.get_user(request)
-
-    if user_instance.id == request.user.id:
-        can_edit = True
-
-    context = {
-        'user': user_instance,
-        'can_edit': can_edit,
-        'username': username,
-    }
-
-    return render(request, 'profile.html', context)
+        return context
 
 
+class AllUsersView(ListView):
+    template_name = 'allusers.html'
+    model = User
+
+    def get_queryset(self):
+        return User.objects.all()
+
+    def get_context_data(self, **kwargs):
+        user_instance = User.objects.all()
+        context = {
+            'users': user_instance,
+        }
+        return context
+
+
+class EditProfileView(UpdateView):
+    template_name = 'edit_profile.html'
+    form_class = ChangeForm
+    model = User
+
+    # def get(self, request, *args, **kwargs):
+    #     self.object = get_object_or_404(User, id=self.kwargs['id'])
+    #     return super(self.object).get(request, *args, **kwargs)
 
 
 def success(request):

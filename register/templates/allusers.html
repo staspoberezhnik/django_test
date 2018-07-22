@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{%  block title %}Users{%  endblock %}
+{% block content %}
+{%  for user in users %}
+
+<h4>{{user.username}}
+
+<a class="btn btn-info"  href="{% url 'profile' user.id %}">View Profile</a>
+</h4>
+
+{%  endfor %}
+
+{% endblock %}

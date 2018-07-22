@@ -1,6 +1,6 @@
 from .models import User
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UserChangeForm
 
 
 class RegistrationForm(UserCreationForm):
@@ -19,28 +19,15 @@ class RegistrationForm(UserCreationForm):
             'photo',
         ]
 
-    # def clean_number(self):
-    #     self.cleaned_data['phone_number'] = '+%s' % self.cleaned_data['phone_number'].replace('+', '')
-    #     valid = True
-    #     try:
-    #         phone = phonenumbers.parse(self.cleaned_data['phone_number'], None)
-    #     except NumberParseException:
-    #         valid = False
-    #     else:
-    #         if not phonenumbers.is_valid_number(phone):
-    #             valid = False
-    #     if valid is False:
-    #         raise ValidationError('Phone number is not valid', code='invalid')
-    #     return self.cleaned_data['phone_number']
 
+class ChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = {
+            'email',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'photo',
+        }
 
-# class LoginForm(forms.ModelForm):
-#
-#     class Meta:
-#         model = User
-#         fields = [
-#             'username',
-#             'email',
-#             'phone_number',
-#             'password',
-#         ]
