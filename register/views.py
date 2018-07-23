@@ -1,14 +1,10 @@
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.views import LoginView, LogoutView
-from django.views.generic import View, TemplateView, ListView
-
-from django.core.exceptions import ValidationError
-from django.shortcuts import render, redirect, get_object_or_404
+from .notifications import send_register_sms
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.shortcuts import render, redirect
 from django.contrib import auth
 from .forms import RegistrationForm, ChangeForm
 from .models import User
-import phonenumbers
-from django.views.generic import CreateView, FormView, UpdateView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView
 
 
 class RegisterView(CreateView):
@@ -22,7 +18,9 @@ class RegisterView(CreateView):
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password1')
         user = auth.authenticate(username=username, password=password)
+        receiver = form.cleaned_data.get('phone_number')
         if user is not None:
+            send_register_sms(username, receiver)
             auth.login(self.request, user)
             return valid
         else:
@@ -37,30 +35,9 @@ class LogOutView(LogoutView):
     redirect_field_name = None
 
 
-class SeeProfileView(ListView):
+class ProfileDetailView(DetailView):
     template_name = 'profile.html'
-
-    def get_queryset(self):
-        return get_object_or_404(User, id=self.kwargs['id'])
-
-    def get_context_data(self, **kwargs):
-        user_instance = get_object_or_404(User, id=self.kwargs['id'])
-        username = None
-        can_edit = None
-        print(user_instance.id, self.request.user.id)
-        if self.request.user.is_staff or \
-                self.request.user.is_superuser or \
-                self.request.user.is_authenticated:
-            username = auth.get_user(self.request).username
-        print('hello')
-        if user_instance.id == self.request.user.id:
-            can_edit = True
-        context = {
-            'user': user_instance,
-            'can_edit': can_edit,
-            'username': username,
-        }
-        return context
+    model = User
 
 
 class AllUsersView(ListView):
@@ -82,14 +59,15 @@ class EditProfileView(UpdateView):
     template_name = 'edit_profile.html'
     form_class = ChangeForm
     model = User
+    success_url = '/'
 
-    # def get(self, request, *args, **kwargs):
-    #     self.object = get_object_or_404(User, id=self.kwargs['id'])
-    #     return super(self.object).get(request, *args, **kwargs)
+
+class ChangePasswordView(PasswordChangeView):
+    template_name = 'change_password.html'
+    success_url = '/success/'
 
 
 def success(request):
-    print(auth.get_user(request))
     if not request.user.is_authenticated:
         return redirect('login')
     else:

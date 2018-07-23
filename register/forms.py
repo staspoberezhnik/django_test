@@ -4,7 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, User
 
 
 class RegistrationForm(UserCreationForm):
-    email = forms.CharField(max_length=75, required=True)
+    email = forms.EmailField(max_length=75, required=True)
 
     class Meta:
         model = User
@@ -21,13 +21,16 @@ class RegistrationForm(UserCreationForm):
 
 
 class ChangeForm(UserChangeForm):
+    email = forms.EmailField(max_length=75, required=True)
+
     class Meta:
         model = User
         fields = {
-            'email',
+            'password',
+            'username',
             'first_name',
             'last_name',
             'phone_number',
+            'email',
             'photo',
         }
-
