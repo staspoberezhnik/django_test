@@ -8,9 +8,7 @@
         <img src='{{ user.photo.url }}' class='img-responsive' width="300px" height="300px">
     {% endif %}
 
-
     <h3>Username : {{ user.username }}</h3>
-
 
     {% if user.first_name %}
         <h4>First name : {{ user.first_name }}</h4>
@@ -28,6 +26,9 @@
         <h4>Telephone : {{ user.phone_number }}</h4>
     {% endif %}
 
+    {% if user.city %}
+        <h4>City from : {{ user.city }}</h4>
+    {% endif %}
 
     {% if user.date_joined %}
         <h4>On site since : {{ user.date_joined }}</h4>

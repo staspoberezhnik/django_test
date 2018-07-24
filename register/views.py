@@ -1,10 +1,12 @@
-from .notifications import send_register_sms
+import json
+from django.http import HttpResponse
+from .notifications import send_register_sms, city_autocomplete
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from .forms import RegistrationForm, ChangeForm
 from .models import User
-from django.views.generic import CreateView, UpdateView, DetailView, ListView
+from django.views.generic import CreateView, UpdateView, DetailView, ListView, View
 
 
 class RegisterView(CreateView):
@@ -15,8 +17,10 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         valid = super(RegisterView, self).form_valid(form)
+
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password1')
+
         user = auth.authenticate(username=username, password=password)
         receiver = form.cleaned_data.get('phone_number')
         if user is not None:
@@ -59,12 +63,22 @@ class EditProfileView(UpdateView):
     template_name = 'edit_profile.html'
     form_class = ChangeForm
     model = User
+    print()
     success_url = '/'
 
 
 class ChangePasswordView(PasswordChangeView):
     template_name = 'change_password.html'
     success_url = '/success/'
+
+
+class CityAutocompleteView(View):
+
+    def get(self, request, *args, **kwargs):
+        city = request.GET.get('term', '')
+
+        return HttpResponse(json.dumps({'err': 'nil', 'results': city_autocomplete(city)}),
+                            content_type='application/json')
 
 
 def success(request):

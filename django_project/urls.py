@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
     url(r'^', include('register.urls')),
+    url(r'^select2/', include('django_select2.urls')),
 ]
 
 if settings.DEBUG:

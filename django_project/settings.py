@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'register',
     'bootstrapform',
+    'django_select2',
 
 ]
 
@@ -122,6 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+API_KEY = 'AIzaSyAE-M4C0I8i2nahy-B93eK8iNPYgDnv5hk'
 AUTH_USER_MODEL = 'register.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'

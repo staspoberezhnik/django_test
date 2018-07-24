@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from . import views
 from .views import RegisterView, LogInView, LogOutView, AllUsersView, EditProfileView, ProfileDetailView, \
-    ChangePasswordView
+    ChangePasswordView, CityAutocompleteView
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
@@ -11,6 +11,8 @@ urlpatterns = [
     url(r'^users/$', AllUsersView.as_view(), name='all_users'),
     url(r'^edit/(?P<pk>\d+)$', EditProfileView.as_view(), name='edit_profile'),
     url(r'^password/$', ChangePasswordView.as_view()),
+    url(r'^city/$', CityAutocompleteView.as_view()),
+
 
     url(r'^success/$', views.success, name='success'),
 ]

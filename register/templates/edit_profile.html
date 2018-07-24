@@ -6,7 +6,6 @@
 {% block content %}
     <div class="well bs-component">
         <form method="post" enctype="multipart/form-data" class="form-horizontal">
-
             {% csrf_token %}
             {{ form|bootstrap_horizontal }}
             <button type="submit" class="btn btn-default">Save</button>

@@ -24,7 +24,8 @@ def validate_phone_number(phone_number):
 
 
 class User(AbstractUser):
-    email = models.EmailField(_('email address'), blank=True, unique=True)
+    email = models.EmailField(_('email address'), blank=False, unique=True)
+    city = models.CharField(max_length=50, blank=True)
     phone_number = models.CharField(
         max_length=20,
         blank=False,
