@@ -1,11 +1,23 @@
 {% extends 'base.html' %}
+{% load bootstrap %}
 
 {% block title %}Users{% endblock %}
 {% block content %}
-    {% for user in users %}
+
+    <form method="get" class="form-horizontal">
+        {{ form|bootstrap_horizontal }}
+        <div class="form-group">
+            <div class="col-lg-10 col-lg-offset-2">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+
+    {% for user in object_list %}
         <h4>{{ user.username }}
             <a class="btn btn-info" href="{% url 'profile' user.id %}">View Profile</a>
         </h4>
     {% endfor %}
+
 
 {% endblock %}

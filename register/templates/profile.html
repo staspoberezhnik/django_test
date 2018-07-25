@@ -38,4 +38,10 @@
         <a href="{% url 'edit_profile' request.user.id %}" class="btn btn-warning">Edit Profile</a>
     {% endif %}
     <a class="btn btn-info" href="{% url 'all_users' %}">Go Back</a>
+
+     {% if request.user.is_authenticated %}
+    {% if object != request.user %}
+        <a href="{% url 'send_request' user.id %}" class="btn btn-warning">Add to friends</a>
+    {% endif %}
+    {%  endif %}
 {% endblock content %}

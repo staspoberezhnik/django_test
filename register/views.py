@@ -1,10 +1,12 @@
 import json
 from django.http import HttpResponse
+from django.views.generic.edit import FormMixin
+
 from .notifications import send_register_sms, city_autocomplete
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
-from .forms import RegistrationForm, ChangeForm
+from .forms import RegistrationForm, ChangeForm, SearchForm
 from .models import User
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, View
 
@@ -44,26 +46,32 @@ class ProfileDetailView(DetailView):
     model = User
 
 
-class AllUsersView(ListView):
+class AllUsersView(FormMixin, ListView):
     template_name = 'allusers.html'
     model = User
+    form_class = SearchForm
+    filter_field = ['city']
 
     def get_queryset(self):
-        return User.objects.all()
+        qs = super().get_queryset()
+        params = self.get_initial()
+        if params:
+            return qs.filter(**params)
+        return qs
 
-    def get_context_data(self, **kwargs):
-        user_instance = User.objects.all()
-        context = {
-            'users': user_instance,
-        }
-        return context
+    def get_initial(self):
+        params = dict()
+        for f in self.filter_field:
+            f_value = self.request.GET.get(f)
+            if f_value:
+                params[f] = f_value
+        return params
 
 
 class EditProfileView(UpdateView):
     template_name = 'edit_profile.html'
     form_class = ChangeForm
     model = User
-    print()
     success_url = '/'
 
 
@@ -79,6 +87,13 @@ class CityAutocompleteView(View):
 
         return HttpResponse(json.dumps({'err': 'nil', 'results': city_autocomplete(city)}),
                             content_type='application/json')
+
+
+class SendFriendRequestView(View):
+
+    def get(self, request, *args, **kwargs):
+
+        pass
 
 
 def success(request):

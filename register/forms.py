@@ -32,13 +32,14 @@ class RegistrationForm(UserCreationForm):
 
 class ChangeForm(UserChangeForm):
     email = forms.EmailField(max_length=75, required=True)
-    password = forms.HiddenInput
+
+    def __init__(self, *args, **kwargs):
+        super(ChangeForm, self).__init__(*args, **kwargs)
+        self.fields['password'].widget = HiddenInput()
 
     class Meta:
         model = User
-
         fields = (
-
             'username',
             'first_name',
             'last_name',
@@ -49,12 +50,15 @@ class ChangeForm(UserChangeForm):
             'password'
         )
         widgets = {
-          'city':  HeavySelect2Widget(
+            'city': HeavySelect2Widget(
                 data_url=' /city/'),
 
         }
 
-    def __init__(self, *args, **kwargs):
-        super(ChangeForm, self).__init__(*args, **kwargs)
-        self.fields['password'].widget = HiddenInput()
 
+class SearchForm(forms.Form):
+    city = forms.CharField(
+        required=False,
+        label='Search user by city',
+        widget=HeavySelect2Widget(data_url='/city/')
+    )

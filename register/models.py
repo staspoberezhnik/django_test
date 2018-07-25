@@ -1,31 +1,18 @@
-import phonenumbers
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from phonenumbers import NumberParseException
 from django.utils.translation import gettext_lazy as _
+from .notifications import validate_phone_number
+
 
 #
 # def upload_location(avatars, filename):
 #     return '{}/{}'.format(avatars, filename)
 
 
-def validate_phone_number(phone_number):
-    valid = True
-    try:
-        phone = phonenumbers.parse(phone_number, None)
-    except NumberParseException:
-        valid = False
-    else:
-        if not phonenumbers.is_valid_number(phone):
-            valid = False
-    if valid is False:
-        raise ValidationError('Phone number is not valid', code='invalid')
-
-
 class User(AbstractUser):
     email = models.EmailField(_('email address'), blank=False, unique=True)
     city = models.CharField(max_length=50, blank=True)
+    friends = models.ManyToManyField('User')
     phone_number = models.CharField(
         max_length=20,
         blank=False,
@@ -38,3 +25,10 @@ class User(AbstractUser):
     def __str__(self):
         name = self.get_full_name()
         return name if name else self.username
+
+
+class FriendshipStatus(models.Model):
+
+    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='receiver', on_delete=models.CASCADE)
+    status = models.BooleanField()
