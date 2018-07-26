@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+
+{% block title %}Notifications{% endblock %}
+{%  block content %}
+    {%  if sender %}
+        {% for user in sender %}
+            <h4><a href="{% url 'profile' user.id %}" >{{ user }} </a>send you friend request<br>
+               <a href="" class="btn-info">Delete</a>
+             <a href="{% url 'add_to_friend' user.id %}" class="btn-warning">Confirm</a> <br>
+            </h4>
+        {%  endfor %}
+    {% else %}
+        <h4>No incoming requests</h4>
+    {% endif %}
+
+{%  endblock %}

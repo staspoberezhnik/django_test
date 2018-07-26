@@ -1,6 +1,7 @@
 import phonenumbers
 import requests
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from phonenumbers import NumberParseException
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
@@ -36,6 +37,7 @@ def city_autocomplete(value):
         results.append({'id': city["description"], 'text': city["description"]})
     return results
 
+
 def validate_phone_number(phone_number):
     valid = True
     try:
@@ -47,3 +49,26 @@ def validate_phone_number(phone_number):
             valid = False
     if valid is False:
         raise ValidationError('Phone number is not valid', code='invalid')
+
+
+def get_friendship_request(sender, receiver):
+    from register.models import FriendshipStatus
+    try:
+        status = FriendshipStatus.objects.get(
+            Q(sender=sender, receiver=receiver) | Q(sender=receiver, receiver=sender)
+        )
+    except FriendshipStatus.DoesNotExist:
+        status = None
+    return status
+
+
+def get_friendship_status(status, sender):
+    friend_status = None
+    if status:
+        if status.status is True:
+            friend_status = 'friends'
+        elif status.sender == sender and status.status is False:
+            friend_status = 'send'
+        else:
+            friend_status = 'receive'
+    return friend_status

@@ -23,12 +23,11 @@ class User(AbstractUser):
     photo = models.ImageField(upload_to='avatars', blank=True, null=True)
 
     def __str__(self):
-        name = self.get_full_name()
-        return name if name else self.username
+        return self.username
 
 
 class FriendshipStatus(models.Model):
 
-    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
-    receiver = models.ForeignKey(User, related_name='receiver', on_delete=models.CASCADE)
+    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE )
+    receiver = models.ForeignKey(User, related_name='receiver', on_delete=models.CASCADE )
     status = models.BooleanField()

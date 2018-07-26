@@ -17,12 +17,20 @@
                 <a class="nav-link"  href="{% url 'profile' request.user.id %}">Profile <span class="sr-only">(current)</span></a>
                 {%  endif %}
             </li>
+        {% if request.user.is_authenticated %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'friends'  %}">Friends</a>
+            </li>
+        {%  endif %}
+
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'all_users'  %}">Users list</a>
             </li>
+        {% if request.user.is_authenticated %}
             <li class="nav-item">
-                <a class="nav-link" href="#">Pricing</a>
+                <a class="nav-link" href="{% url 'notification'  %}">Notification</a>
             </li>
+        {%  endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
         {% if request.user.is_authenticated %}

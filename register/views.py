@@ -1,14 +1,15 @@
 import json
 from django.http import HttpResponse
 from django.views.generic.edit import FormMixin
-
-from .notifications import send_register_sms, city_autocomplete
+from django.db.models import Q
+from .notifications import send_register_sms, city_autocomplete,\
+    get_friendship_request, get_friendship_status
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from .forms import RegistrationForm, ChangeForm, SearchForm
-from .models import User
-from django.views.generic import CreateView, UpdateView, DetailView, ListView, View
+from .models import User, FriendshipStatus
+from django.views.generic import CreateView, UpdateView, DetailView, ListView, View, TemplateView
 
 
 class RegisterView(CreateView):
@@ -44,6 +45,16 @@ class LogOutView(LogoutView):
 class ProfileDetailView(DetailView):
     template_name = 'profile.html'
     model = User
+
+    def get_context_data(self, **kwargs):
+        sender = None
+        if self.request.user.is_authenticated:
+            sender = self.request.user
+        receiver = User.objects.get(pk=self.object.id)
+        if sender:
+            status = get_friendship_request(sender, receiver)
+            kwargs['status'] = get_friendship_status(status, sender)
+        return super().get_context_data(**kwargs)
 
 
 class AllUsersView(FormMixin, ListView):
@@ -81,7 +92,6 @@ class ChangePasswordView(PasswordChangeView):
 
 
 class CityAutocompleteView(View):
-
     def get(self, request, *args, **kwargs):
         city = request.GET.get('term', '')
 
@@ -90,10 +100,69 @@ class CityAutocompleteView(View):
 
 
 class SendFriendRequestView(View):
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            sender = self.request.user
+            receiver = User.objects.get(pk=kwargs['pk'])
+            friend_request = FriendshipStatus(
+                sender=sender,
+                receiver=receiver,
+                status=False
+            )
+            friend_request.save()
+        return redirect('/profile/' + kwargs['pk'])
+
+
+class NotificationView(TemplateView):
+    template_name = 'notifications.html'
 
     def get(self, request, *args, **kwargs):
+        status = FriendshipStatus.objects.filter(status=False, receiver=self.request.user)
+        request_id = []
+        request_name = []
+        if status:
+            for value in status:
+                request_id.append(value.id)
+                request_name.append(value.sender)
+        return self.render_to_response(context={'sender': request_name,
+                                                'sender_id': request_id})
 
-        pass
+
+class AddToFriendView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            sender = self.request.user
+            receiver = User.objects.get(pk=kwargs['pk'])
+            friend_request = FriendshipStatus.objects.get(
+                Q(sender=sender, receiver=receiver) | Q(sender=receiver, receiver=sender)
+            )
+            friend_request.status = True
+            friend_request.save()
+        return redirect('all_users')
+
+
+class RemoveFromFriendView(TemplateView):
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            sender = self.request.user
+            receiver = User.objects.get(pk=kwargs['pk'])
+            friend_request = FriendshipStatus.objects.get(
+                Q(sender=sender, receiver=receiver) | Q(sender=receiver, receiver=sender)
+            )
+
+            friend_request.delete()
+        return redirect('/profile/' + kwargs['pk'])
+
+
+class FriendsView(ListView):
+    template_name = 'friends.html'
+    model = User
+
+    def get_queryset(self):
+        friends_request = FriendshipStatus.objects.filter(
+            (Q(sender=self.request.user) | Q(receiver=self.request.user)) & Q(status=True)
+        )
+        return friends_request
 
 
 def success(request):

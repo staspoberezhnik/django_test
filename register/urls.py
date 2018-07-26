@@ -1,7 +1,8 @@
 from django.conf.urls import url
 from . import views
 from .views import RegisterView, LogInView, LogOutView, AllUsersView, EditProfileView, ProfileDetailView, \
-    ChangePasswordView, CityAutocompleteView, SendFriendRequestView
+    ChangePasswordView, CityAutocompleteView, SendFriendRequestView, NotificationView, AddToFriendView, \
+    RemoveFromFriendView, FriendsView
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
@@ -13,8 +14,10 @@ urlpatterns = [
     url(r'^password/$', ChangePasswordView.as_view()),
     url(r'^city/$', CityAutocompleteView.as_view()),
     url(r'^send_request/(?P<pk>\d+)$', SendFriendRequestView.as_view(), name='send_request'),
-
-
+    url(r'^add_to_friend/(?P<pk>\d+)$', AddToFriendView.as_view(), name='add_to_friend'),
+    url(r'^remove/(?P<pk>\d+)$', RemoveFromFriendView.as_view(), name='remove'),
+    url(r'^notification/$', NotificationView.as_view(), name='notification'),
+    url(r'^friends/$', FriendsView.as_view(), name='friends'),
 
     url(r'^success/$', views.success, name='success'),
 ]
