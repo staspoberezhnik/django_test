@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from .notifications import validate_phone_number
 
@@ -28,6 +29,15 @@ class User(AbstractUser):
 
 class FriendshipStatus(models.Model):
 
-    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE )
-    receiver = models.ForeignKey(User, related_name='receiver', on_delete=models.CASCADE )
+    sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='receiver', on_delete=models.CASCADE)
     status = models.BooleanField()
+
+    def get_friendship_request(self, receiver):
+        try:
+            status = FriendshipStatus.objects.get(
+                Q(sender=self.sender, receiver=receiver) | Q(sender=receiver, receiver=self.sender)
+            )
+        except FriendshipStatus.DoesNotExist:
+            status = None
+        return status

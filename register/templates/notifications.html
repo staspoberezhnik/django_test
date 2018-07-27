@@ -6,7 +6,7 @@
     {%  if sender %}
         {% for user in sender %}
             <h4><a href="{% url 'profile' user.id %}" >{{ user }} </a>send you friend request<br>
-               <a href="" class="btn-info">Delete</a>
+               <a href="{% url 'remove' user.id %}" class="btn-info">Delete</a>
              <a href="{% url 'add_to_friend' user.id %}" class="btn-warning">Confirm</a> <br>
             </h4>
         {%  endfor %}

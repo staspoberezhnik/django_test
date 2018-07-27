@@ -1,9 +1,7 @@
 import json
 from django.http import HttpResponse
 from django.views.generic.edit import FormMixin
-from django.db.models import Q
-from .notifications import send_register_sms, city_autocomplete,\
-    get_friendship_request, get_friendship_status
+from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
@@ -51,7 +49,10 @@ class ProfileDetailView(DetailView):
         if self.request.user.is_authenticated:
             sender = self.request.user
         receiver = User.objects.get(pk=self.object.id)
+        friends = self.request.user.friends.filter(user=sender)
+        print(friends)
         if sender:
+            kwargs['friends'] = self.request.user.friends.filter(user=sender)
             status = get_friendship_request(sender, receiver)
             kwargs['status'] = get_friendship_status(status, sender)
         return super().get_context_data(**kwargs)
@@ -104,12 +105,12 @@ class SendFriendRequestView(View):
         if self.request.user.is_authenticated:
             sender = self.request.user
             receiver = User.objects.get(pk=kwargs['pk'])
-            friend_request = FriendshipStatus(
+            create_friend_request = FriendshipStatus(
                 sender=sender,
                 receiver=receiver,
                 status=False
             )
-            friend_request.save()
+            create_friend_request.save()
         return redirect('/profile/' + kwargs['pk'])
 
 
@@ -133,11 +134,11 @@ class AddToFriendView(TemplateView):
         if self.request.user.is_authenticated:
             sender = self.request.user
             receiver = User.objects.get(pk=kwargs['pk'])
-            friend_request = FriendshipStatus.objects.get(
-                Q(sender=sender, receiver=receiver) | Q(sender=receiver, receiver=sender)
-            )
-            friend_request.status = True
-            friend_request.save()
+            friend_request = get_friendship_request(sender, receiver)
+            friend_request.receiver.friends.add(receiver)
+            friend_request.sender.friends.add(sender)
+            friend_request.delete()
+
         return redirect('all_users')
 
 
@@ -146,11 +147,8 @@ class RemoveFromFriendView(TemplateView):
         if self.request.user.is_authenticated:
             sender = self.request.user
             receiver = User.objects.get(pk=kwargs['pk'])
-            friend_request = FriendshipStatus.objects.get(
-                Q(sender=sender, receiver=receiver) | Q(sender=receiver, receiver=sender)
-            )
-
-            friend_request.delete()
+            self.request.user.friends.remove(receiver)
+            receiver.friends.remove(sender)
         return redirect('/profile/' + kwargs['pk'])
 
 
@@ -159,10 +157,14 @@ class FriendsView(ListView):
     model = User
 
     def get_queryset(self):
-        friends_request = FriendshipStatus.objects.filter(
-            (Q(sender=self.request.user) | Q(receiver=self.request.user)) & Q(status=True)
-        )
-        return friends_request
+        return self.request.user.friends.all()
+
+
+class NearestUserView(TemplateView):
+    template_name = 'nearest.html'
+    
+    def get(self, request, *args, **kwargs):
+        friends = self.request.user.friends.all()
 
 
 def success(request):

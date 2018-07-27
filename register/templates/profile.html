@@ -9,9 +9,10 @@
     {% endif %}
 
 
-    <h3>Username : {{ user.username }}{% if status == 'friends' %} - <b class="text-primary"> friend</b>
+    <h3>Username : {{ user.username }}{%  if user in friends %} - <b class="text-primary"> friend</b>
         <a href="{% url 'remove' user.id %}" class="btn-danger">Delete</a></h3>
     {% endif %}
+
 
     {% if user.first_name %}
         <h4>First name : {{ user.first_name }}</h4>
@@ -44,10 +45,10 @@
     {% if request.user.is_authenticated %}
         {% if object != request.user %}
 
-            {% if not status %}
+            {% if user not in friends and user != request.user and not status  %}
                 <a href="{% url 'send_request' user.id %}" class="btn btn-warning">Add to friends</a>
-
-            {% elif status == 'receive' %}
+              {% endif %}
+            {% if status == 'receive' %}
                 <h4 class="text-success">{{ user.username }} send you friend request
                     <a href="{% url 'remove' user.id %}" class="btn-info">Delete</a>
                     <a href="{% url 'add_to_friend' user.id %}" class="btn-warning">Confirm</a> <br>

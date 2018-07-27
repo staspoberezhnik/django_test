@@ -65,9 +65,7 @@ def get_friendship_request(sender, receiver):
 def get_friendship_status(status, sender):
     friend_status = None
     if status:
-        if status.status is True:
-            friend_status = 'friends'
-        elif status.sender == sender and status.status is False:
+        if status.sender == sender and status.status is False:
             friend_status = 'send'
         else:
             friend_status = 'receive'

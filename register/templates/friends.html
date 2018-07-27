@@ -2,23 +2,16 @@
 
 {% block title %}Friends{% endblock %}
 {% block content %}
-    {%  if object_list %}
-    {% for user in object_list %}
-        {% if  user.sender != request.user %}
-            <h4>{{ user.sender }}
-                <a class="btn-info" href="{% url 'profile' user.sender.id %}">View Profile</a>
-                <a href="{% url 'remove' user.sender.id %}" class="btn-danger">Delete from friends</a>
+    {% if object_list %}
+        {% for user in object_list %}
+            <h4>{{ user }}
+                <a class="btn-info" href="{% url 'profile' user.id %}">View Profile</a>
+                <a href="{% url 'remove' user.id %}" class="btn-danger">Delete from friends</a>
             </h4>
-        {% elif user.receiver != request.user %}
-
-            <h4>{{ user.receiver }}
-                <a class="btn-info" href="{% url 'profile' user.receiver.id %}">View Profile</a>
-                <a href="{% url 'remove' user.receiver.id %}" class="btn-danger">Delete from friends</a></h4>
-        {% endif %}
-    {% endfor %}
-    {%  else %}
-        <h4>No friends Yet</h4>
-    {%  endif %}
+        {% endfor %}
+    {% else %}
+        <h3>No friends Yet</h3>
+    {% endif %}
 
 {% endblock %}
 
