@@ -38,6 +38,19 @@ def city_autocomplete(value):
     return results
 
 
+def search_near_users(city, destination):
+    url = 'https://maps.googleapis.com/maps/api/distancematrix/' \
+          'json?origins={city}&destinations={destination}&key={key}'.format(city=city,
+                                                                            destination=destination,
+                                                                            key=API_KEY)
+    request = requests.get(url).json()
+    if request['status'] == 'INVALID_REQUEST':
+        return None
+    elif request['rows'][0]['elements'][0]['status'] == 'ZERO_RESULTS':
+        return None
+    return request['rows'][0]['elements'][0]['distance']['text']
+
+
 def validate_phone_number(phone_number):
     valid = True
     try:

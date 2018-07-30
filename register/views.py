@@ -1,7 +1,8 @@
 import json
 from django.http import HttpResponse
 from django.views.generic.edit import FormMixin
-from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status
+from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status, \
+    search_near_users
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
@@ -162,9 +163,22 @@ class FriendsView(ListView):
 
 class NearestUserView(TemplateView):
     template_name = 'nearest.html'
-    
+
     def get(self, request, *args, **kwargs):
-        friends = self.request.user.friends.all()
+        user_city = self.request.user.city
+        if not user_city:
+            return self.render_to_response(context={'city': user_city})
+        users = User.objects.exclude(pk=self.request.user.id).exclude(city='')
+        distances = list()
+        for user in users:
+            distance = search_near_users(user_city, user.city)
+            if distance is not None:
+                distances.append((user.username, float(distance.replace(' km', ''))))
+        nearest = [u for u, d in sorted(distances, key=lambda x:x[1])]
+        print(nearest[:2])
+        return self.render_to_response(context={'city': user_city,
+                                                'nearest': nearest[:2]
+                                                })
 
 
 def success(request):

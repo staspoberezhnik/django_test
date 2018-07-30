@@ -3,6 +3,17 @@
 {% block title %}Nearest user{% endblock %}
 {% block content %}
 
+    {% if city %}
+        <h4>You are from {{ city }}<br></h4>
+    {% else %}
+        Input Your City<br>
+    {% endif %}
 
+    {% if nearest %}
+        {% for user in nearest %}
+            <h4>
+                Nearest user to you <b>{{ user }}</b></h4>
+        {% endfor %}
+    {% endif %}
 
-{%  endblock %}
+{% endblock %}
