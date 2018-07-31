@@ -9,11 +9,10 @@
         Input Your City<br>
     {% endif %}
 
-    {% if nearest %}
-        {% for user in nearest %}
-            <h4>
-                Nearest user to you <b>{{ user }}</b></h4>
-        {% endfor %}
-    {% endif %}
+    {% for user, distance in nearest %}
+        <h4>Nearest user to you <a href="{% url 'profile' user.id %}"> {{ user.username }}</a>: {{ distance }} km</h4>
+    {% empty %}
+        <h4>You are alone on your continent</h4>
+    {% endfor %}
 
 {% endblock %}

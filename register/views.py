@@ -9,6 +9,7 @@ from django.contrib import auth
 from .forms import RegistrationForm, ChangeForm, SearchForm
 from .models import User, FriendshipStatus
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, View, TemplateView
+from django.core.cache import cache
 
 
 class RegisterView(CreateView):
@@ -19,10 +20,8 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         valid = super(RegisterView, self).form_valid(form)
-
         username = form.cleaned_data.get('username')
         password = form.cleaned_data.get('password1')
-
         user = auth.authenticate(username=username, password=password)
         receiver = form.cleaned_data.get('phone_number')
         if user is not None:
@@ -51,7 +50,6 @@ class ProfileDetailView(DetailView):
             sender = self.request.user
         receiver = User.objects.get(pk=self.object.id)
         friends = self.request.user.friends.filter(user=sender)
-        print(friends)
         if sender:
             kwargs['friends'] = self.request.user.friends.filter(user=sender)
             status = get_friendship_request(sender, receiver)
@@ -165,19 +163,24 @@ class NearestUserView(TemplateView):
     template_name = 'nearest.html'
 
     def get(self, request, *args, **kwargs):
-        user_city = self.request.user.city
-        if not user_city:
-            return self.render_to_response(context={'city': user_city})
+        current_user_city = self.request.user.city
+        if not current_user_city:
+            return self.render_to_response(context={'city': current_user_city})
         users = User.objects.exclude(pk=self.request.user.id).exclude(city='')
         distances = list()
         for user in users:
-            distance = search_near_users(user_city, user.city)
-            if distance is not None:
-                distances.append((user.username, float(distance.replace(' km', ''))))
-        nearest = [u for u, d in sorted(distances, key=lambda x:x[1])]
-        print(nearest[:2])
-        return self.render_to_response(context={'city': user_city,
-                                                'nearest': nearest[:2]
+            cache_key = '_'.join(str(sorted([self.request.user.id, user.id])).replace(' ', ''))
+            distance = cache.get(cache_key)
+            if not distance:
+                distance = search_near_users(current_user_city, user.city)
+                if not distance:
+                    continue
+                distance = float(distance.replace(' km', ''))
+                cache.set(cache_key, distance)
+            distances.append((user, distance))
+        nearest = [(u, d) for u, d in sorted(distances, key=lambda x:x[1])]
+        return self.render_to_response(context={'city': current_user_city,
+                                                'nearest': nearest[:5]
                                                 })
 
 

@@ -50,7 +50,7 @@ def search_near_users(city, destination):
         return None
     return request['rows'][0]['elements'][0]['distance']['text']
 
-
+ 
 def validate_phone_number(phone_number):
     valid = True
     try:

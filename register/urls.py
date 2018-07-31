@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^friends/$', FriendsView.as_view(), name='friends'),
     url(r'^nearest_users/$', NearestUserView.as_view(), name='nearest_users'),
 
+
     url(r'^success/$', views.success, name='success'),
 ]

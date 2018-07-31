@@ -154,3 +154,10 @@ STATICFILES_DIRS = (
 
 MEDIA_URL = '/avatars/'
 MEDIA_ROOT = os.path.join(BASE_DIR, "avatars")
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
+    }
+}
