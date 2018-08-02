@@ -1,8 +1,8 @@
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.views.generic.edit import FormMixin
 from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status, \
-    search_near_users
+    search_near_users, CsrfExemptMixin, AuthMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
@@ -169,19 +169,28 @@ class NearestUserView(TemplateView):
         users = User.objects.exclude(pk=self.request.user.id).exclude(city='')
         distances = list()
         for user in users:
-            cache_key = '_'.join(str(sorted([self.request.user.id, user.id])).replace(' ', ''))
+            cache_key = '_'.join(sorted([str(self.request.user.id), str(user.id)]))
             distance = cache.get(cache_key)
             if not distance:
                 distance = search_near_users(current_user_city, user.city)
                 if not distance:
                     continue
-                distance = float(distance.replace(' km', ''))
-                cache.set(cache_key, distance)
-            distances.append((user, distance))
+            cache.set(cache_key, distance)
+            distances.append((user, round((distance/1000), 1)))
         nearest = [(u, d) for u, d in sorted(distances, key=lambda x:x[1])]
         return self.render_to_response(context={'city': current_user_city,
-                                                'nearest': nearest[:5]
-                                                })
+                                                'nearest': nearest[:5]}
+                                       )
+
+
+class GetAccessTokenView(CsrfExemptMixin, AuthMixin, View):
+    def post(self, request, *args, **kwargs):
+
+        grant = request.POST.get('grant_type')
+        if grant != 'client_credentials':
+            return HttpResponseForbidden()
+        token = self.app.create_token()
+        return JsonResponse(status=200, data=token.make_response_body())
 
 
 def success(request):

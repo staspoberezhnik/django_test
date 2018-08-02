@@ -1,15 +1,28 @@
+import base64
+import random
+import datetime
 import phonenumbers
 import requests
 from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.http import HttpResponseForbidden
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from phonenumbers import NumberParseException
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 from decouple import config
-
 from django_project.settings import API_KEY
 
-client = Client(config('account_sid'), config('auth_token'))
+UNICODE_ASCII_CHARACTER_SET = ('abcdefghijklmnopqrstuvwxyz'
+                               'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                               '0123456789')
+CLIENT_SECRET_GENERATOR_LENGTH = 128
+CLIENT_ID_GENERATOR_LENGTH = 40
+ACCESS_TOKEN_EXPIRATION = 60 * 60
+
+client = Client(config('twilio_sid'), config('twilio_token'))
 
 
 def send_register_sms(username, receiver=None):
@@ -20,7 +33,7 @@ def send_register_sms(username, receiver=None):
             message = username + ' you are successfully register'
             client.messages.create(
                 to=receiver,
-                from_=config('sms_sender'),
+                from_=config('twilio_sender'),
                 body=message,
             )
         except TwilioRestException:
@@ -44,11 +57,9 @@ def search_near_users(city, destination):
                                                                             destination=destination,
                                                                             key=API_KEY)
     request = requests.get(url).json()
-    if request['status'] == 'INVALID_REQUEST':
+    if request['rows'][0]['elements'][0]['status'] == 'ZERO_RESULTS':
         return None
-    elif request['rows'][0]['elements'][0]['status'] == 'ZERO_RESULTS':
-        return None
-    return request['rows'][0]['elements'][0]['distance']['text']
+    return request['rows'][0]['elements'][0]['distance']['value']
 
  
 def validate_phone_number(phone_number):
@@ -83,3 +94,43 @@ def get_friendship_status(status, sender):
         else:
             friend_status = 'receive'
     return friend_status
+
+
+def generate_token(length=30, chars=UNICODE_ASCII_CHARACTER_SET):
+    rand = random.SystemRandom()
+    return ''.join(rand.choice(chars) for _ in range(length))
+
+
+def generate_client_id():
+    return generate_token(length=CLIENT_ID_GENERATOR_LENGTH)
+
+
+def generate_client_secret():
+    return generate_token(length=CLIENT_SECRET_GENERATOR_LENGTH)
+
+
+def get_expiration_time():
+    return timezone.now() + datetime.timedelta(seconds=ACCESS_TOKEN_EXPIRATION)
+
+
+class CsrfExemptMixin(object):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CsrfExemptMixin, self).dispatch(request, *args, **kwargs)
+
+
+class AuthMixin(object):
+    app = None
+
+    def dispatch(self, request, *args, **kwargs):
+        from .models import MyApplication
+        try:
+            auth = request.META.get('HTTP_AUTHORIZATION').replace('Basic ', '')
+            client_id, client_secret = base64.b64decode(auth).decode().split(':')
+        except (AttributeError, UnicodeDecodeError, Exception) as e:
+            return HttpResponseForbidden()
+        try:
+            self.app = MyApplication.objects.get(client_id=client_id, client_secret=client_secret)
+        except MyApplication.DoesNotExist:
+            return HttpResponseForbidden()
+        return super(AuthMixin, self).dispatch(request, *args, **kwargs)

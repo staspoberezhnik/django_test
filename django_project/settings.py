@@ -125,6 +125,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 API_KEY = config('GOOGLE_KEY')
 AUTH_USER_MODEL = 'register.User'
+REDIRECT_URI = config('REDIRECT_URI')
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 # Internationalization
@@ -159,5 +160,6 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
         'LOCATION': 'cache_table',
+        'TIMEOUT': 90,
     }
 }

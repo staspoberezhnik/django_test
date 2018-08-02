@@ -4,13 +4,15 @@
 {% block content %}
 
     {% if city %}
-        <h4>You are from {{ city }}<br></h4>
+        <h4>You are from <b>{{ city }}</b><br></h4>
     {% else %}
         Input Your City<br>
     {% endif %}
 
     {% for user, distance in nearest %}
-        <h4>Nearest user to you <a href="{% url 'profile' user.id %}"> {{ user.username }}</a>: {{ distance }} km</h4>
+        <h4>Nearest user to you <a href="{% url 'profile' user.id %}"> {{ user.username }}</a><br>
+            From - <b>{{ user.city }}</b>
+            : {{ distance }} km</h4>
     {% empty %}
         <h4>You are alone on your continent</h4>
     {% endfor %}
