@@ -13,7 +13,7 @@ from phonenumbers import NumberParseException
 from twilio.base.exceptions import TwilioRestException
 from twilio.rest import Client
 from decouple import config
-from django_project.settings import API_KEY
+from django_project.settings import GOOGLE_API_KEY
 
 UNICODE_ASCII_CHARACTER_SET = ('abcdefghijklmnopqrstuvwxyz'
                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -42,7 +42,7 @@ def send_register_sms(username, receiver=None):
 
 def city_autocomplete(value):
     url = 'https://maps.googleapis.com/maps/api/place/autocomplete' \
-          '/json?input={city}&types=(cities)&language=us&key={key}'.format(city=value, key=API_KEY)
+          '/json?input={city}&types=(cities)&language=us&key={key}'.format(city=value, key=GOOGLE_API_KEY)
     request = requests.get(url).json()
     cities = [city for city in request['predictions']]
     results = []
@@ -55,7 +55,7 @@ def search_near_users(city, destination):
     url = 'https://maps.googleapis.com/maps/api/distancematrix/' \
           'json?origins={city}&destinations={destination}&key={key}'.format(city=city,
                                                                             destination=destination,
-                                                                            key=API_KEY)
+                                                                            key=GOOGLE_API_KEY)
     request = requests.get(url).json()
     if request['rows'][0]['elements'][0]['status'] == 'ZERO_RESULTS':
         return None

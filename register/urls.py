@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^nearest_users/$', NearestUserView.as_view(), name='nearest_users'),
     url(r'^token/?$', GetAccessTokenView.as_view(), name="token"),
 
+
     url(r'^success/$', views.success, name='success'),
 ]

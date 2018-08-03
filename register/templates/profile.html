@@ -41,13 +41,6 @@
     {% if object == request.user %}
         <a href="{% url 'edit_profile' request.user.id %}" class="btn btn-success">Edit Profile</a>
 
-    <form action="{%url 'token'%}" method="post" class="form-horizontal" >
-        {% csrf_token %}
-
-                <button class="btn btn-success" type="submit" id="grant_type" value="client_credentials">
-                    let aceess</button>
-     </form>
-
     {% endif %}
 
     {% if request.user.is_authenticated %}

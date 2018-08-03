@@ -1,4 +1,6 @@
 import json
+
+from decouple import config
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.views.generic.edit import FormMixin
 from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status, \
@@ -185,7 +187,6 @@ class NearestUserView(TemplateView):
 
 class GetAccessTokenView(CsrfExemptMixin, AuthMixin, View):
     def post(self, request, *args, **kwargs):
-
         grant = request.POST.get('grant_type')
         if grant != 'client_credentials':
             return HttpResponseForbidden()
