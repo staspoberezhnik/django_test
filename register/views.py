@@ -1,6 +1,4 @@
 import json
-
-from decouple import config
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.views.generic.edit import FormMixin
 from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status, \
@@ -9,7 +7,7 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
 from django.contrib import auth
 from .forms import RegistrationForm, ChangeForm, SearchForm
-from .models import User, FriendshipStatus
+from .models import User, FriendshipStatus, AccessToken
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, View, TemplateView
 from django.core.cache import cache
 
@@ -186,12 +184,25 @@ class NearestUserView(TemplateView):
 
 
 class GetAccessTokenView(CsrfExemptMixin, AuthMixin, View):
+
     def post(self, request, *args, **kwargs):
         grant = request.POST.get('grant_type')
         if grant != 'client_credentials':
             return HttpResponseForbidden()
         token = self.app.create_token()
         return JsonResponse(status=200, data=token.make_response_body())
+
+
+class ProtectedDataView(CsrfExemptMixin, View):
+    def get(self, request, *args, ** kwargs):
+        try:
+            token = request.META.get('HTTP_AUTHORIZATION').replace('Bearer ', '')
+        except (AttributeError, UnicodeDecodeError, Exception) as e:
+            return HttpResponseForbidden()
+        get_token = AccessToken.objects.get(token=token)
+        if get_token.is_valid():
+            return JsonResponse(data=dict(status='success', data='protected_data'))
+        return HttpResponseForbidden()
 
 
 def success(request):
