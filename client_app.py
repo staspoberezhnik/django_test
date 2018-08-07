@@ -1,10 +1,10 @@
 import base64
 
 import requests
+from decouple import config
 
-client_id = '4PCZ8MisjtQKwDNQw0SjYGrp032e1xoz029i6NqW'
-client_secret = 'rguCFxVUY37VBnSumVfsMJchNNJRNQRfeqoez9fE7R3fpm9ZF3hKPcPYs3o' \
-                'EfFYeY1QwP89H5Voe51UnnmjENQWgVcUzrwttY9Zhad3LH5QkQ13hqWpSrtCIQbrJ8TmT'
+client_id = config('client_id')
+client_secret = config('client_secret')
 
 auth_key = '%s:%s' % (client_id, client_secret)
 
@@ -16,14 +16,12 @@ response = requests.post(
         'Content-Type': 'application/x-www-form-urlencoded',
     }
 )
-
-
+access_token = response.json()['access_token']
 protected_data = requests.get(
     url='http://127.0.0.1:8000/protected_data/',
     headers={
-        'Authorization': 'Bearer %s' % response.json()['access_token']
+        'Authorization': 'Bearer %s' % access_token
     }
-    )
-
-print(protected_data.json())
+)
+print(protected_data)
 print(response.json())

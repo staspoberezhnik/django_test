@@ -6,11 +6,6 @@ from .notifications import validate_phone_number, get_expiration_time, generate_
     generate_token, ACCESS_TOKEN_EXPIRATION
 
 
-#
-# def upload_location(avatars, filename):
-#     return '{}/{}'.format(avatars, filename)
-
-
 class User(AbstractUser):
     email = models.EmailField(_('email address'), blank=False, unique=True)
     city = models.CharField(max_length=50, blank=True)
@@ -64,7 +59,6 @@ class AccessToken(models.Model):
     def is_valid(self, scopes=None):
         """
         Checks if the access token is valid.
-
         :param scopes: An iterable containing the scopes to check or None
         """
         return not self.is_expired() and self.allow_scopes(scopes)
@@ -81,7 +75,6 @@ class AccessToken(models.Model):
     def allow_scopes(self, scopes):
         """
         Check if the token allows the provided scopes
-
         :param scopes: An iterable containing the scopes to check
         """
         if not scopes:
