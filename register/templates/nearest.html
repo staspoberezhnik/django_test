@@ -10,7 +10,7 @@
     {% endif %}
 
     {% for user, distance in nearest %}
-        <h4>Nearest user to you <a href="{% url 'profile' user.id %}"> {{ user.username }}</a><br>
+        <h4>Nearest user to you <a href="{% url 'profile' user.id %}"><b> {{ user.username }}</b></a><br>
             From - <b>{{ user.city }}</b>
             : {{ distance }} km</h4>
     {% empty %}

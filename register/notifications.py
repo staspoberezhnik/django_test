@@ -3,17 +3,20 @@ import random
 import datetime
 import phonenumbers
 import requests
+
+from decouple import config
+from phonenumbers import NumberParseException
+from twilio.base.exceptions import TwilioRestException
+from twilio.rest import Client
+
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from phonenumbers import NumberParseException
-from twilio.base.exceptions import TwilioRestException
-from twilio.rest import Client
-from decouple import config
 from django_project.settings import GOOGLE_API_KEY
+
 
 UNICODE_ASCII_CHARACTER_SET = ('abcdefghijklmnopqrstuvwxyz'
                                'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -134,3 +137,16 @@ class AuthMixin(object):
         except MyApplication.DoesNotExist:
             return HttpResponseForbidden()
         return super(AuthMixin, self).dispatch(request, *args, **kwargs)
+
+
+class ProtectedViewMixin(object):
+    def dispatch(self, request, *args, **kwargs):
+        from .models import AccessToken
+        try:
+            token = request.META.get('HTTP_AUTHORIZATION').replace('Bearer ', '')
+        except (AttributeError, UnicodeDecodeError, Exception) as e:
+            return HttpResponseForbidden()
+        for token in AccessToken.objects.filter(token=token):
+            if token.is_valid():
+                return super(ProtectedViewMixin, self).dispatch(request, *args, **kwargs)
+        return HttpResponseForbidden()

@@ -23,5 +23,5 @@ protected_data = requests.get(
         'Authorization': 'Bearer %s' % access_token
     }
 )
-print(protected_data)
-print(response.json())
+print(protected_data.json()['results'])
+
