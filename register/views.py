@@ -1,5 +1,7 @@
 import json
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+import csv
+
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, StreamingHttpResponse
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.shortcuts import render, redirect
@@ -8,7 +10,7 @@ from django.views.generic import CreateView, UpdateView, DetailView, ListView, V
 from django.core.cache import cache
 
 from .forms import RegistrationForm, ChangeForm, SearchForm
-from .models import User, FriendshipStatus, AccessToken
+from .models import User, FriendshipStatus
 from .notifications import send_register_sms, city_autocomplete, get_friendship_request, get_friendship_status, \
     search_near_users, CsrfExemptMixin, AuthMixin, ProtectedViewMixin
 
@@ -205,6 +207,32 @@ class ProtectedDataView(CsrfExemptMixin, ProtectedViewMixin, View):
             )
             json_res.append(json_obj)
         return JsonResponse({'results': json_res})
+
+
+class Echo:
+    """An object that implements just the write method of the file-like
+    interface.
+    """
+    def write(self, value):
+        """Write the value by returning it, instead of storing in a buffer."""
+        return value
+
+
+class ReturnCsvDataView(View):
+    def get(self, request, *args, **kwargs):
+        users = User.objects.all()
+        filename = "{}.csv".format('users')
+        pseudo_buffer = Echo()
+        writer = csv.writer(pseudo_buffer)
+        headers = ('id', 'username', 'email', 'telephone', 'first name', 'last name', 'city from')
+        rows = [headers]
+        print(rows)
+        rows.extend(users.values_list('pk', 'username', 'email', 'phone_number', 'first_name', 'last_name', 'city'))
+        print(rows)
+        response = StreamingHttpResponse((writer.writerow(row) for row in rows),
+                                         content_type="text/csv")
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        return response
 
 
 def success(request):

@@ -17,11 +17,11 @@ response = requests.post(
     }
 )
 access_token = response.json()['access_token']
-protected_data = requests.get(
+protected_data_response = requests.get(
     url='http://127.0.0.1:8000/protected_data/',
     headers={
         'Authorization': 'Bearer %s' % access_token
     }
 )
-print(protected_data.json()['results'])
+print(protected_data_response.json()['results'])
 

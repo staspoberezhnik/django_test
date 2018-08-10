@@ -2,7 +2,7 @@ from django.conf.urls import url
 from . import views
 from .views import RegisterView, LogInView, LogOutView, AllUsersView, EditProfileView, ProfileDetailView, \
     ChangePasswordView, CityAutocompleteView, SendFriendRequestView, NotificationView, AddToFriendView, \
-    RemoveFromFriendView, FriendsView, NearestUserView, GetAccessTokenView, ProtectedDataView
+    RemoveFromFriendView, FriendsView, NearestUserView, GetAccessTokenView, ProtectedDataView, ReturnCsvDataView
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^nearest_users/$', NearestUserView.as_view(), name='nearest_users'),
     url(r'^token/?$', GetAccessTokenView.as_view()),
     url(r'^protected_data/?$', ProtectedDataView.as_view()),
+    url(r'^get_csv_data/?$', ReturnCsvDataView.as_view(), name='get_csv'),
 
 
     url(r'^success/$', views.success, name='success'),
