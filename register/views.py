@@ -235,6 +235,9 @@ class ReturnCsvDataView(View):
         return response
 
 
+# class
+
+
 def success(request):
     if not request.user.is_authenticated:
         return redirect('login')

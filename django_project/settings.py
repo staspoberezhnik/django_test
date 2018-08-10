@@ -28,7 +28,7 @@ SECRET_KEY = 't&zz$z0@5nf(w5o=j&y15w__f+!526e=afhoc==qojf294a_de'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+SITE_ID = 1
 
 # Application definition
 
@@ -37,15 +37,25 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'register',
     'bootstrapform',
     'django_select2',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'oauth2_provider',
+    'corsheaders',
+
 
 ]
 
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -103,6 +113,8 @@ AUTHENTICATION_BACKENDS = (
 
     'django.contrib.auth.backends.ModelBackend',
     'register.backend.NameTelephoneEmailAuth',
+    'allauth.account.auth_backends.AuthenticationBackend',
+
 )
 
 # Password validation
@@ -128,6 +140,9 @@ AUTH_USER_MODEL = 'register.User'
 REDIRECT_URI = config('REDIRECT_URI')
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+CORS_ORIGIN_ALLOW_ALL = True
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
