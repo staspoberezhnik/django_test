@@ -40,9 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'register',
     'bootstrapform',
     'django_select2',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -79,6 +81,12 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            # 'loaders': [
+            #    ('django.template.loaders.cached.Loader', [
+            #        'django.template.loaders.filesystem.Loader',
+            #        'django.template.loaders.app_directories.Loader',
+            #    ]),
+
         },
     },
 ]
@@ -136,13 +144,25 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 GOOGLE_API_KEY = config('GOOGLE_KEY')
-AUTH_USER_MODEL = 'register.User'
 REDIRECT_URI = config('REDIRECT_URI')
+
+GOOGLE_OAUTH2_CLIENT_ID=config('GOOGLE_OAUTH_ID')
+GOOGLE_OAUTH2_CLIENT_SECRET=config('GOOGLE_OAUTH_KEY')
+
+AUTH_USER_MODEL = 'register.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 

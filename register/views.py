@@ -1,6 +1,8 @@
 import json
 import csv
 
+import requests
+from decouple import config
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, StreamingHttpResponse
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
@@ -233,9 +235,6 @@ class ReturnCsvDataView(View):
                                          content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
         return response
-
-
-# class
 
 
 def success(request):

@@ -14,11 +14,14 @@
                 <button class="btn btn-success" type="submit">Log in</button>
                 <a href='{% url "register" %}' class="btn btn-warning">Register</a>
                 <input type="hidden" name="next" value="{{ next }}" />
-                 <input type="submit" class="btn btn-primary" style="float: right" value="{% trans "Sign In" %}" />
+                <a href="{% url 'authorize' %}">Log in with google</a>
+
             </div>
         </div>
     </form>
     </div>
+
+
 {% endblock %}
 
 
