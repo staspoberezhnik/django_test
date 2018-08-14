@@ -1,5 +1,4 @@
 from django.conf.urls import url
-# from django.urls import include
 from django.urls import include
 from oauth2_provider.views import AuthorizationView, TokenView, RevokeTokenView
 
