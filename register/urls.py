@@ -9,8 +9,6 @@ from .views import RegisterView, LogInView, LogOutView, AllUsersView, EditProfil
 
 urlpatterns = [
 
-
-
     url(r'^register/$', RegisterView.as_view(), name='register'),
     url(r'^login/$', LogInView.as_view(), name='login'),
     url(r'^logout/$', LogOutView.as_view(), name='logout'),
