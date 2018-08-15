@@ -228,9 +228,7 @@ class ReturnCsvDataView(View):
         writer = csv.writer(pseudo_buffer)
         headers = ('id', 'username', 'email', 'telephone', 'first name', 'last name', 'city from')
         rows = [headers]
-        print(rows)
         rows.extend(users.values_list('pk', 'username', 'email', 'phone_number', 'first_name', 'last_name', 'city'))
-        print(rows)
         response = StreamingHttpResponse((writer.writerow(row) for row in rows),
                                          content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)

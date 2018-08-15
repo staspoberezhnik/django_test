@@ -27,7 +27,7 @@ SECRET_KEY = 't&zz$z0@5nf(w5o=j&y15w__f+!526e=afhoc==qojf294a_de'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1']
 SITE_ID = 1
 
 # Application definition
@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'oauth2_provider',
 
 
 ]
@@ -79,11 +78,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            # 'loaders': [
-            #    ('django.template.loaders.cached.Loader', [
-            #        'django.template.loaders.filesystem.Loader',
-            #        'django.template.loaders.app_directories.Loader',
-            #    ]),
 
         },
     },
@@ -134,16 +128,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 GOOGLE_API_KEY = config('GOOGLE_KEY')
-REDIRECT_URI = config('REDIRECT_URI')
-
-GOOGLE_OAUTH2_CLIENT_ID=config('GOOGLE_OAUTH_ID')
-GOOGLE_OAUTH2_CLIENT_SECRET=config('GOOGLE_OAUTH_KEY')
 
 AUTH_USER_MODEL = 'register.User'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

@@ -11,12 +11,11 @@
     <form action="{%url 'login'%}" method="post" class="form-horizontal" >
         {% csrf_token %}
         {{ form|bootstrap_horizontal }}
-
         <div class="form-group">
             <div class="col-lg-10 col-lg-offset-2">
                 <button class="btn btn-success" type="submit">Log in</button>
                 <a href='{% url "register" %}' class="btn btn-warning">Register</a>
-
+                <a class="btn btn-primary" style="width: 220px; float: right;" href="{% provider_login_url 'google' %}">Sign Up with google</a>
             </div>
         </div>
     </form>
@@ -25,14 +24,7 @@
     <h3>{{ message }}</h3>
     {% endfor %}
 
- <p><strong>-- OR --</strong></p>
-    <a href="{% provider_login_url 'google' %}">Sign Up with google</a>
-    {% if socialaccount_providers %}
-    <div class="socialaccount_ballot">
-          log in with
-        {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-    </div>
-    {% endif %}
+
 {% endblock %}
 
 

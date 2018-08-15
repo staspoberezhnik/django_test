@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.urls import include
-from oauth2_provider.views import AuthorizationView, TokenView, RevokeTokenView
 
 from . import views
 from .views import RegisterView, LogInView, LogOutView, AllUsersView, EditProfileView, ProfileDetailView, \
@@ -29,9 +28,6 @@ urlpatterns = [
 
     url(r'^accounts/', include('allauth.urls')),
 
-    url(r'^authorize/?$', AuthorizationView.as_view(), name="authorize"),
-    url(r'^google_token/?$', TokenView.as_view(), name="token"),
-    url(r'^revoke_token/?$', RevokeTokenView.as_view(), name="revoke-token"),
 
     url(r'^success/$', views.success, name='success'),
 ]
